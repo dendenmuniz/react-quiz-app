@@ -67,6 +67,36 @@ h1 {
 
 .start {
     max-width: 200px;
+    height: 60px;
     
+}
+
+.select {
+  color: #fff;
+  font-family:  'Catamaran', sans-serif;
+  font-size: 1.5rem ;
+  padding: 10px 20px; 
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #662212, #a37a71);
+  cursor: pointer;
+  border: 2px solid #662212;
+  box-shadow: 0px 5px 10px rgba(0,0,0,0.25);
+  margin: 10px;
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #662212;
+}
+
+.select option {
+  font-size: 1.6rem ;
+  padding: 10px;
+  background: linear-gradient(180deg, #662212, #a37a71);
+}
+
+.select option:hover {
+  background-color: #a37a71;
 }
 `;

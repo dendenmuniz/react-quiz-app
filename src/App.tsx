@@ -31,13 +31,12 @@ const App = () => {
     gameOver: false,
   });
 
+  const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.EASY);
+
   //Start the game, consuming the API to gather the questions
   const handleStartTrivia = async () => {
     setState({ ...state, loading: true, gameOver: false });
-    const newQuestions = await fetchQuizQuestions(
-      TOTAL_QUESTIONS,
-      Difficulty.EASY
-    );
+    const newQuestions = await fetchQuizQuestions(TOTAL_QUESTIONS, difficulty);
 
     setState({
       ...state,
@@ -85,10 +84,22 @@ const App = () => {
       <Wrapper>
         <h1> React Quiz</h1>
         {/* If not Game Over and doesn't have answers for total questions -> shows button to start the game */}
-        {!state.gameOver || (state.userAnswers.length === TOTAL_QUESTIONS) ? (
-          <button className="start" onClick={handleStartTrivia}>
-            Start
-          </button>
+        {!state.gameOver || state.userAnswers.length === TOTAL_QUESTIONS ? (
+          <div>
+            <select
+              className="select"
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+            >
+              <option value={Difficulty.EASY}>Easy</option>
+              <option value={Difficulty.MEDIUM}>Medium</option>
+              <option value={Difficulty.HARD}>Hard</option>
+            </select>
+
+            <button className="start" onClick={handleStartTrivia}>
+              Start
+            </button>
+          </div>
         ) : null}
         {/* Check if the game is over to show Score */}
         {!state.gameOver ? <p className="score">Score: {state.score}</p> : null}
