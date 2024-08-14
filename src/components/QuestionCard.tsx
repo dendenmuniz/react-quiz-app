@@ -11,6 +11,7 @@ type Props = {
   totalQuestions: number;
 };
 
+//Question Card - Question and Answer buttons
 const QuestionCard: React.FC<Props> = ({
   question,
   answers,
@@ -31,6 +32,9 @@ const QuestionCard: React.FC<Props> = ({
           $correct={userAnswer?.correctAnswer === answer}
           $userClicked={userAnswer?.answer === answer}
         >
+          {/* buttons disable once user clicks in one answer;
+          if correct answer, button turns green and 1 to Score, 
+          if not correct, button turns red and point out the correct answer in green */}
           <button
             disabled={userAnswer ? true : false}
             value={answer}

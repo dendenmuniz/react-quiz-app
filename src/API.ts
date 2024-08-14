@@ -17,11 +17,13 @@ export type Question = {
 
 export type QuestionState = Question & { answers: string[] };
 
+const API_ENDPOINT = "https://opentdb.com/api.php";
+
 export const fetchQuizQuestions = async (
-  amount: number,
+  totalQuestions: number,
   difficulty: Difficulty
 ) => {
-  const endpoint = `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}&type=multiple`;
+  /*  const endpoint = `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}&type=multiple`;
   const data = await (await fetch(endpoint)).json();
   return data.results.map((question: Question) => ({
     ...question,
@@ -29,5 +31,21 @@ export const fetchQuizQuestions = async (
       ...question.incorrect_answers,
       question.correct_answer,
     ]),
-  }));
+  })); */
+  try {
+    const response = await fetch(
+      `${API_ENDPOINT}?amount=${totalQuestions}&difficulty=${difficulty}`
+    );
+    const data = await response.json();
+    return data.results.map((question: Question) => ({
+      ...question,
+      answers: shuffleArray([
+        ...question.incorrect_answers,
+        question.correct_answer,
+      ]),
+    }));
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };

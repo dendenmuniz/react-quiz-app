@@ -12,6 +12,7 @@ export const GlobalStyle = createGlobalStyle`
         padding: 0 20px;
         display: flex;
         justify-content: center;
+        font-size: 3rem;
     }
     
     * {
@@ -36,7 +37,7 @@ aling-items: center;
 }
 
 h1 {
-    font-family: Quicksand Inline, Haettenschweiler, 'Arial Narrow Bold', 'sans-serif';
+    font-family: Roboto Inline, Haettenschweiler, 'Arial Narrow Bold', 'sans-serif';
     background-image: linear-gradient(180deg, #125666, #a0bbc2);
     background-size: 100%;
     backgrounf-clip: text;
@@ -45,8 +46,8 @@ h1 {
     -moz-background-clip: text;
     -moz-text-fill-color: transparent;
     filter: drop-shadow(2px 2px #e7eef0)
-    font-size: 70px;
-    font-weight: 400;
+    font-size: 4rem;
+    font-weight: 300;
     text-align: center;
     margin: 20px;
 }

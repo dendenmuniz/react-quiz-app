@@ -10,56 +10,72 @@ export type AnswerObject = {
   correct: boolean;
 };
 
+interface AppState {
+  loading: boolean;
+  questions: QuestionState[];
+  number: number;
+  userAnswers: AnswerObject[];
+  score: number;
+  gameOver: boolean;
+}
+
 const TOTAL_QUESTIONS = 10;
 
 const App = () => {
-  const [loading, setLoading] = useState(false);
-  const [questions, setQuestions] = useState<QuestionState[]>([]);
-  const [number, setNumber] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
-  const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
+  const [state, setState] = useState<AppState>({
+    loading: false,
+    questions: [],
+    number: 0,
+    userAnswers: [],
+    score: 0,
+    gameOver: false,
+  });
 
-  const startTrivia = async () => {
-    setLoading(true);
-    setGameOver(false);
+  //Start the game, consuming the API to gather the questions
+  const handleStartTrivia = async () => {
+    setState({ ...state, loading: true, gameOver: false });
     const newQuestions = await fetchQuizQuestions(
       TOTAL_QUESTIONS,
       Difficulty.EASY
     );
 
-    setQuestions(newQuestions);
-    setScore(0);
-    setUserAnswers([]);
-    setNumber(0);
-    setLoading(false);
+    setState({
+      ...state,
+      questions: newQuestions,
+      score: 0,
+      userAnswers: [],
+      number: 0,
+      loading: false,
+    });
   };
 
-  const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!gameOver) {
+  // Trigger check user Answer and update Score
+  const handleCheckAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!state.gameOver) {
       const answer = e.currentTarget.value;
-      //Check answer against the correct answer
-      const correct = questions[number].correct_answer === answer;
-      // Add score
-      if (correct) setScore((prev) => prev + 1);
-      //Save answer in user answer array
-      const answerObject = {
-        question: questions[number].question,
-        answer,
-        correct,
-        correctAnswer: questions[number].correct_answer,
-      };
-      setUserAnswers((prev) => [...prev, answerObject]);
+      const correct = state.questions[state.number].correct_answer === answer;
+      setState({
+        ...state,
+        score: correct ? state.score + 1 : state.score,
+        userAnswers: [
+          ...state.userAnswers,
+          {
+            question: state.questions[state.number].question,
+            answer,
+            correct,
+            correctAnswer: state.questions[state.number].correct_answer,
+          },
+        ],
+      });
     }
   };
 
-  const nextQuestion = () => {
-    //Move to next if not the last
-    const nextQuestion = number + 1;
-    if (nextQuestion === TOTAL_QUESTIONS) {
-      setGameOver(true);
+  //Move to next if not the last
+  const handleNextQuestion = () => {
+    if (state.number + 1 < TOTAL_QUESTIONS) {
+      setState({ ...state, number: state.number + 1 });
     } else {
-      setNumber(nextQuestion);
+      setState({ ...state, gameOver: true });
     }
   };
 
@@ -68,31 +84,38 @@ const App = () => {
       <GlobalStyle />
       <Wrapper>
         <h1> React Quiz</h1>
-        {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
-          <button className="start" onClick={startTrivia}>
+        {/* If not Game Over and doesn't have answers for total questions -> shows button to start the game */}
+        {!state.gameOver || (state.userAnswers.length === TOTAL_QUESTIONS) ? (
+          <button className="start" onClick={handleStartTrivia}>
             Start
           </button>
         ) : null}
+        {/* Check if the game is over to show Score */}
+        {!state.gameOver ? <p className="score">Score: {state.score}</p> : null}
 
-        {!gameOver ? <p className="score">Score: {score}</p> : null}
+        {/* Check if got the response from API, otherwise show message of Loading */}
+        {state.loading && <p>Loading Questions...</p>}
 
-        {loading && <p>Loading Questions...</p>}
-
-        {!loading && !gameOver && questions.length > 0 && (
+        {/* Check if is loaded the questions and game is not over to show the questions */}
+        {!state.loading && !state.gameOver && state.questions.length > 0 && (
           <QuestionCard
-            questionNr={number + 1}
+            questionNr={state.number + 1}
             totalQuestions={TOTAL_QUESTIONS}
-            question={questions[number].question}
-            answers={questions[number].answers}
-            userAnswer={userAnswers ? userAnswers[number] : undefined}
-            callback={checkAnswer}
+            question={state.questions[state.number].question}
+            answers={state.questions[state.number].answers}
+            userAnswer={
+              state.userAnswers ? state.userAnswers[state.number] : undefined
+            }
+            callback={handleCheckAnswer}
           />
         )}
-        {!gameOver &&
-        !loading &&
-        userAnswers.length === number + 1 &&
-        number !== TOTAL_QUESTIONS - 1 ? (
-          <button className="next" onClick={nextQuestion}>
+
+        {/* Check if user has answered the question, there is more questions to answer and is loaded to allow the user go to the next question*/}
+        {!state.gameOver &&
+        !state.loading &&
+        state.userAnswers.length === state.number + 1 &&
+        state.number !== TOTAL_QUESTIONS - 1 ? (
+          <button className="next" onClick={handleNextQuestion}>
             Next question
           </button>
         ) : null}
